@@ -11,10 +11,19 @@ var builder = WebApplication.CreateBuilder(args);
 // Controladores
 builder.Services.AddControllers();
 
-// Configuración de Entity Framework Core con SQL Server
+// Configuración de Entity Framework Core (SQL Server para producción / SQLite para testing local)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<DbA358b2Pam3Context>(options =>
-    options.UseSqlServer(connectionString));
+{
+    if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("Data Source=", StringComparison.OrdinalIgnoreCase))
+    {
+        options.UseSqlite(connectionString);
+    }
+    else
+    {
+        options.UseSqlServer(connectionString);
+    }
+});
 
 // Inyección de dependencias (Scoped para convivir con el ciclo de vida del DbContext)
 builder.Services.AddScoped<ContactoService>();
@@ -75,6 +84,16 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+// Inicialización de base de datos en entorno de desarrollo
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<DbA358b2Pam3Context>();
+    if (context.Database.IsSqlite())
+    {
+        context.Database.EnsureCreated();
+    }
+}
 
 // Swagger disponible para testing
 app.UseSwagger();
