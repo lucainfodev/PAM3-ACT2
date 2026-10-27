@@ -97,7 +97,7 @@ app.UseAuthorization();
 app.MapGet("/minimal/contactos", async (ContactoService contactoService) =>
 {
     return Results.Ok(await contactoService.ObtenerTodosAsync());
-});
+}).RequireAuthorization();
 
 app.MapControllers();
 

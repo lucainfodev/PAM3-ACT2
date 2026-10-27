@@ -1,8 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using GestionContactosAPI.DTOs;
 using GestionContactosAPI.Models;
 
 namespace GestionContactosAPI.Controllers;
@@ -12,30 +15,70 @@ namespace GestionContactosAPI.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
+    private readonly DbA358b2Pam3Context _context;
+    private readonly PasswordHasher<Usuario> _passwordHasher = new();
 
-    public AuthController(IConfiguration configuration)
+    public AuthController(IConfiguration configuration, DbA358b2Pam3Context context)
     {
         _configuration = configuration;
+        _context = context;
     }
 
-    [HttpPost("login")]
-    public IActionResult Login([FromBody] UsuarioLogin credenciales)
+    /// <summary>
+    /// Registra un usuario nuevo. Responde 409 si el email ya existe.
+    /// </summary>
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        // validacion de credenciales admin / 1234
-        if (credenciales.Usuario == "admin" && credenciales.Password == "1234")
+        var email = request.Email.Trim().ToLowerInvariant();
+
+        if (await _context.Usuarios.AnyAsync(u => u.Email == email))
         {
-            var token = GenerarTokenJwt(credenciales.Usuario, "Admin");
-            return Ok(new
-            {
-                mensaje = "Autenticación exitosa",
-                token = token
-            });
+            return Conflict(new { mensaje = "Ya existe un usuario registrado con ese email" });
         }
 
-        return Unauthorized(new { mensaje = "Credenciales inválidas" });
+        var usuario = new Usuario
+        {
+            Nombre = request.Nombre,
+            Email = email
+        };
+        usuario.Password = _passwordHasher.HashPassword(usuario, request.Password);
+
+        _context.Usuarios.Add(usuario);
+        await _context.SaveChangesAsync();
+
+        return StatusCode(StatusCodes.Status201Created, new
+        {
+            mensaje = "Usuario registrado correctamente",
+            id = usuario.Id,
+            email = usuario.Email
+        });
     }
 
-    private string GenerarTokenJwt(string usuario, string rol)
+    /// <summary>
+    /// Valida las credenciales contra la base y devuelve un JWT.
+    /// </summary>
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        var email = request.Email.Trim().ToLowerInvariant();
+        var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+
+        // Mismo mensaje para email inexistente y contraseña incorrecta
+        if (usuario == null ||
+            _passwordHasher.VerifyHashedPassword(usuario, usuario.Password, request.Password) == PasswordVerificationResult.Failed)
+        {
+            return Unauthorized(new { mensaje = "Credenciales inválidas" });
+        }
+
+        return Ok(new
+        {
+            mensaje = "Autenticación exitosa",
+            token = GenerarTokenJwt(usuario)
+        });
+    }
+
+    private string GenerarTokenJwt(Usuario usuario)
     {
         var jwtSettings = _configuration.GetSection("Jwt");
         var secretKey = jwtSettings["Key"]!;
@@ -44,8 +87,9 @@ public class AuthController : ControllerBase
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, usuario),
-            new Claim(ClaimTypes.Role, rol),
+            new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+            new Claim(ClaimTypes.Email, usuario.Email),
+            new Claim(ClaimTypes.Name, usuario.Nombre ?? usuario.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
@@ -53,7 +97,7 @@ public class AuthController : ControllerBase
             issuer: jwtSettings["Issuer"],
             audience: jwtSettings["Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(30),
+            expires: DateTime.UtcNow.AddHours(2),
             signingCredentials: creds
         );
 
