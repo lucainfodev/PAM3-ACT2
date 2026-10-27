@@ -64,9 +64,29 @@ public class AuthController : ControllerBase
         var email = request.Email.Trim().ToLowerInvariant();
         var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
 
-        // Mismo mensaje para email inexistente y contraseña incorrecta
-        if (usuario == null ||
-            _passwordHasher.VerifyHashedPassword(usuario, usuario.Password, request.Password) == PasswordVerificationResult.Failed)
+        if (usuario == null)
+        {
+            return Unauthorized(new { mensaje = "Credenciales inválidas" });
+        }
+
+        bool passwordValida = false;
+        try
+        {
+            var result = _passwordHasher.VerifyHashedPassword(usuario, usuario.Password, request.Password);
+            passwordValida = (result != PasswordVerificationResult.Failed);
+        }
+        catch
+        {
+            passwordValida = false;
+        }
+
+        // Compatibilidad: permite login si la contraseña en la base de datos estaba en texto plano
+        if (!passwordValida && usuario.Password == request.Password)
+        {
+            passwordValida = true;
+        }
+
+        if (!passwordValida)
         {
             return Unauthorized(new { mensaje = "Credenciales inválidas" });
         }

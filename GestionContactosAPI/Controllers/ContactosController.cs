@@ -21,8 +21,6 @@ public class ContactosController : ControllerBase
     /// 1. Obtener la lista completa de contactos desde la base de datos.
     /// </summary>
     [HttpGet]
-    [Route("")]
-    [Route("all")]
     public async Task<ActionResult<IEnumerable<Contacto>>> ObtenerTodos()
     {
         var contactos = await _contactoService.ObtenerTodosAsync();
@@ -48,8 +46,7 @@ public class ContactosController : ControllerBase
     /// 3. Agregar un nuevo contacto a la base de datos.
     /// </summary>
     [HttpPost]
-    [Route("")]
-    [Route("add")]
+    [HttpPost("add")]
     public async Task<ActionResult<Contacto>> Agregar([FromBody] Contacto contacto)
     {
         if (!ModelState.IsValid)
@@ -65,7 +62,7 @@ public class ContactosController : ControllerBase
     /// 4. Editar un contacto existente por Id.
     /// </summary>
     [HttpPut("{id}")]
-    [Route("edit/{id}")]
+    [HttpPut("edit/{id}")]
     public async Task<ActionResult> Editar(int id, [FromBody] Contacto contacto)
     {
         if (!ModelState.IsValid)

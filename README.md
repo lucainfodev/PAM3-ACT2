@@ -3,35 +3,36 @@
 
 ---
 
-### Módulo Asignado: Datos y Contactos
-**Alumno:** Luca Gomez  
+### Trabajo Grupal: Persistencia con EF Core y Autenticación JWT
 **Repositorio Oficial:** [https://github.com/lucainfodev/PAM3-ACT2](https://github.com/lucainfodev/PAM3-ACT2)  
 
 ---
 
 ## 📌 Guía Paso a Paso y Material de Defensa
 
-Este documento contiene la explicación exhaustiva de la arquitectura, configuración y desarrollo implementado para la **Actividad Obligatoria 2**, enfocado en la persistencia con **Entity Framework Core (Database First)** y la gestión de la entidad **Contacto**.
+Este documento contiene la explicación exhaustiva de la arquitectura, configuración y desarrollo implementado para la **Actividad Obligatoria 2**, cubriendo tanto la persistencia con **Entity Framework Core (Database First)** como la **Autenticación con JWT**.
 
 ---
 
 ### 1. Instalación de Herramientas y Paquetes NuGet de EF Core
 
 #### Herramienta Global CLI:
-Para poder realizar operaciones de ingeniería inversa (Scaffolding) y gestión de Entity Framework Core desde la consola, se instaló la herramienta global `dotnet-ef`:
+Para realizar operaciones de ingeniería inversa (Scaffolding) y gestión de Entity Framework Core desde la consola, se instaló la herramienta global `dotnet-ef`:
 ```bash
 dotnet tool install --global dotnet-ef
 ```
 
 #### Paquetes NuGet Requeridos:
-En el archivo `GestionContactosAPI.csproj` se incorporaron los paquetes oficiales de Entity Framework Core compatibles con .NET:
+En el archivo `GestionContactosAPI.csproj` se incorporaron los paquetes oficiales de Entity Framework Core y autenticación:
 1. **`Microsoft.EntityFrameworkCore.SqlServer`**: El proveedor de base de datos específico para Microsoft SQL Server. Se encarga de traducir las consultas LINQ a sentencias T-SQL nativas y comunicarse con el motor relacional.
 2. **`Microsoft.EntityFrameworkCore.Design`**: Provee los componentes de diseño necesarios para ejecutar comandos de scaffolding, migraciones y generación de código en tiempo de desarrollo.
+3. **`Microsoft.AspNetCore.Authentication.JwtBearer`**: Middleware oficial para validar tokens JWT en cada petición HTTP autenticada.
 
 Comandos ejecutados:
 ```bash
 dotnet add package Microsoft.EntityFrameworkCore.SqlServer
 dotnet add package Microsoft.EntityFrameworkCore.Design
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
 ```
 
 ---
@@ -138,6 +139,27 @@ El controlador está protegido con `[Authorize]` y expone los 4 endpoints solici
 | **Editar contacto** | `PUT` | `/api/contacto/{id}` | Modifica los datos de un contacto existente. | `200 OK` / `404 Not Found` / `400 Bad Request` |
 
 *(Se mantuvieron además las rutas secundarias `add` y `edit/{id}` para garantizar 100% de compatibilidad con versiones previas).*
+
+---
+
+### 6. Autenticación de Usuarios con JWT (Register y Login)
+
+En `Controllers/AuthController.cs`:
+
+1. **DTOs Utilizados (`DTOs/`):**
+   - `LoginRequest`: Contiene `Email` y `Password` con validaciones de atributos `[Required]` y `[EmailAddress]`.
+   - `RegisterRequest`: Contiene `Nombre`, `Email` y `Password` (con requerimiento de longitud mínima).
+
+2. **Endpoints de Autenticación:**
+   - `POST /api/auth/register`:
+     - Normaliza el correo electrónico (`Trim().ToLowerInvariant()`).
+     - Valida en base de datos si el email ya se encuentra en uso (`AnyAsync`), respondiendo `409 Conflict` en caso duplicado.
+     - Aplica un algoritmo seguro de derivación de claves mediante `PasswordHasher<Usuario>` de ASP.NET Core Identity.
+     - Persiste el nuevo usuario y responde con `201 Created`.
+   - `POST /api/auth/login`:
+     - Valida la existencia del usuario en la base de datos por email.
+     - Verifica la clave con `PasswordHasher` (con fallback de texto plano para compatibilidad con usuarios precargados de prueba).
+     - Genera un token JWT firmado con la clave simétrica (`HmacSha256`) que incluye claims de `NameIdentifier`, `Email`, `Name` y `Jti`.
 
 ---
 
