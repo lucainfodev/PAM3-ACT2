@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -85,13 +86,27 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Inicialización de base de datos en entorno de desarrollo
+// Inicialización de base de datos y Seed Data
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<DbA358b2Pam3Context>();
     if (context.Database.IsSqlite())
     {
         context.Database.EnsureCreated();
+    }
+
+    var defaultEmail = "lgomez730@alumnos.iua.edu.ar";
+    if (!context.Usuarios.Any(u => u.Email == defaultEmail))
+    {
+        var hasher = new PasswordHasher<Usuario>();
+        var user = new Usuario
+        {
+            Nombre = "Luca Gomez",
+            Email = defaultEmail
+        };
+        user.Password = hasher.HashPassword(user, "Tudai123");
+        context.Usuarios.Add(user);
+        context.SaveChanges();
     }
 }
 
