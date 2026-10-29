@@ -120,9 +120,11 @@ Controlador protegido mediante el atributo `[Authorize]` que expone los endpoint
 
 ### 6. Autenticación y Autorización con JWT (`Controllers/AuthController.cs`)
 
-1. **DTOs de Transferencia (`DTOs/`):**
-   * `LoginRequest`: Recibe `Email` y `Password` con validaciones de atributos `[Required]` y `[EmailAddress]`.
-   * `RegisterRequest`: Recibe `Nombre`, `Email` y `Password` (con requerimiento de longitud mínima).
+En `Controllers/AuthController.cs`:
+
+1. **DTOs Utilizados (`DTOs/`):**
+   - `LoginRequest`: Contiene `Email` y `Password` con validaciones de atributos `[Required]` y `[EmailAddress]`.
+   - `Register` recibe directamente el modelo `Usuario` (`Nombre`, `Email`, `Password`), como indica la consigna: `Register(Usuario usuario)`.
 
 2. **Endpoints de Autenticación:**
    * **`POST /api/auth/register`**:

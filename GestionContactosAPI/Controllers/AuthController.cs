@@ -28,21 +28,18 @@ public class AuthController : ControllerBase
     /// Registra un usuario nuevo. Responde 409 si el email ya existe.
     /// </summary>
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    public async Task<IActionResult> Register([FromBody] Usuario usuario)
     {
-        var email = request.Email.Trim().ToLowerInvariant();
+        var email = usuario.Email.Trim().ToLowerInvariant();
 
         if (await _context.Usuarios.AnyAsync(u => u.Email == email))
         {
             return Conflict(new { mensaje = "Ya existe un usuario registrado con ese email" });
         }
 
-        var usuario = new Usuario
-        {
-            Nombre = request.Nombre,
-            Email = email
-        };
-        usuario.Password = _passwordHasher.HashPassword(usuario, request.Password);
+        usuario.Id = 0;
+        usuario.Email = email;
+        usuario.Password = _passwordHasher.HashPassword(usuario, usuario.Password);
 
         _context.Usuarios.Add(usuario);
         await _context.SaveChangesAsync();
