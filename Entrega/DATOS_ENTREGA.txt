@@ -1,0 +1,59 @@
+================================================================================
+ACTIVIDAD OBLIGATORIA INTEGRADORA Nº 2
+Programación de Aplicaciones Móviles III - TUDAI / IUA
+================================================================================
+
+DATOS DEL ALUMNO / GRUPO:
+- Alumno: Luca Gomez (y compañero de grupo)
+- Correo institucional: lgomez730@alumnos.iua.edu.ar
+- Repositorio Oficial en GitHub: https://github.com/lucainfodev/PAM3-ACT2
+- Fecha de entrega: Octubre / Noviembre 2026
+
+--------------------------------------------------------------------------------
+1. JWT DE EJEMPLO GENERADO
+--------------------------------------------------------------------------------
+Usuario: Luca Gomez
+Email: lgomez730@alumnos.iua.edu.ar
+Rol / Claims: NameIdentifier (Id: 1), Email, Name, Jti
+Vigencia: 2 horas desde su emisión
+
+Token:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJsZ29tZXo3MzBAYWx1bW5vcy5pdWEuZWR1LmFyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Ikx1Y2EgR29tZXoiLCJqdGkiOiJlMjFkY2MxMy0yMWRiLTRkOTMtYmQ4ZS02MjNhMmZjODdiY2IiLCJleHAiOjE3OTMyOTMwMTgsImlzcyI6Ikdlc3Rpb25Db250YWN0b3NBUEkiLCJhdWQiOiJHZXN0aW9uQ29udGFjdG9zQVBJIn0.yAYo_J1bwZxmsv4TdyO8OK_KEOciNBHOyZMx_BWemqs
+
+
+--------------------------------------------------------------------------------
+2. CREDENCIALES PRECARGADAS PARA TESTING EN SWAGGER
+--------------------------------------------------------------------------------
+Para probar directamente en Swagger sin necesidad de registrarse:
+- Endpoint: POST /api/auth/login
+- Body:
+  {
+    "email": "lgomez730@alumnos.iua.edu.ar",
+    "password": "Tudai123"
+  }
+
+*(También se pueden registrar usuarios adicionales desde el endpoint POST /api/auth/register).*
+
+
+--------------------------------------------------------------------------------
+3. BASE DE DATOS Y CONEXIÓN
+--------------------------------------------------------------------------------
+El proyecto se encuentra configurado para conectarse al servidor SQL Server en la nube:
+- Servidor: SQL8002.site4now.net
+- Base de datos: db_a358b2_pam3
+- Usuario: db_a358b2_pam3_admin
+- Password: TudaiPam32548-
+- Cadena configurada en appsettings.json:
+  "Server=SQL8002.site4now.net;Database=db_a358b2_pam3;User Id=db_a358b2_pam3_admin;Password=TudaiPam32548-;TrustServerCertificate=True;"
+
+
+--------------------------------------------------------------------------------
+4. INSTRUCCIONES DE EJECUCIÓN
+--------------------------------------------------------------------------------
+1) Abrir la carpeta del proyecto en Visual Studio Code o terminal.
+2) Restaurar y ejecutar la API:
+   dotnet run --launch-profile "http"
+3) Abrir el navegador en:
+   http://localhost:5197/swagger
+4) Iniciar sesión en POST /api/auth/login, copiar el token y autorizarse con el
+   botón verde "Authorize" para probar los endpoints de contactos.

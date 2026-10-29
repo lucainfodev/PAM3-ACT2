@@ -1,0 +1,51 @@
+================================================================================
+TUDAI - IUA | Programación de Aplicaciones Móviles III
+Actividad Obligatoria Integradora Nº 2: Persistencia con EF Core y JWT
+================================================================================
+
+1. RESUMEN DEL TRABAJO IMPLEMENTADO
+--------------------------------------------------------------------------------
+En esta segunda entrega se implementó la persistencia real de datos mediante
+Entity Framework Core (enfoque Database First) conectado a la base de datos SQL
+Server remota provista por la cátedra, junto con el sistema de autenticación y
+autorización mediante JSON Web Tokens (JWT).
+
+Componentes desarrollados:
+- Modelos generados por scaffolding: Contacto, Usuario y DbA358b2Pam3Context.
+- Reemplazo de ContactoService en memoria por operaciones asíncronas con EF Core
+  y registro Scoped en el contenedor de dependencias.
+- Controlador ContactosController con los 4 endpoints requeridos protegidos con
+  el atributo [Authorize]:
+    * GET  /api/contacto         -> Listar todos los contactos.
+    * GET  /api/contacto/{id}    -> Obtener contacto por ID.
+    * POST /api/contacto         -> Agregar nuevo contacto (201 CreatedAtAction).
+    * PUT  /api/contacto/{id}    -> Editar contacto existente (200 OK / 404).
+- Controlador AuthController:
+    * POST /api/auth/register    -> Registro de usuarios con validación de email
+                                    duplicado y contraseña hasheada.
+    * POST /api/auth/login       -> Validación de credenciales y emisión de JWT.
+- Documentación interactiva con Swagger UI con soporte para token Bearer.
+
+
+2. DATOS DE CONEXIÓN A SQL SERVER
+--------------------------------------------------------------------------------
+Servidor: SQL8002.site4now.net
+Base de Datos: db_a358b2_pam3
+Usuario: db_a358b2_pam3_admin
+Password: TudaiPam32548-
+Cadena: Server=SQL8002.site4now.net;Database=db_a358b2_pam3;User Id=db_a358b2_pam3_admin;Password=TudaiPam32548-;TrustServerCertificate=True;
+
+
+3. REPOSITORIO GITHUB
+--------------------------------------------------------------------------------
+El código fuente versionado completo se encuentra disponible en:
+https://github.com/lucainfodev/PAM3-ACT2
+
+
+4. CÓMO EJECUTAR EL PROYECTO
+--------------------------------------------------------------------------------
+1) Abrir la terminal en la carpeta 'GestionContactosAPI'.
+2) Ejecutar:
+   dotnet run --launch-profile "http"
+3) Ingresar en el navegador a:
+   http://localhost:5197/swagger
