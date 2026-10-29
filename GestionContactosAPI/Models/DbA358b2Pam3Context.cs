@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace GestionContactosAPI.Models;
@@ -14,15 +16,16 @@ public partial class DbA358b2Pam3Context : DbContext
     }
 
     public virtual DbSet<Contacto> Contactos { get; set; } = null!;
+
     public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Contacto>(entity =>
         {
-            entity.ToTable("Contacto");
-
             entity.HasKey(e => e.Id);
+
+            entity.ToTable("Contacto");
 
             entity.Property(e => e.Id)
                 .ValueGeneratedOnAdd();
@@ -44,9 +47,9 @@ public partial class DbA358b2Pam3Context : DbContext
 
         modelBuilder.Entity<Usuario>(entity =>
         {
-            entity.ToTable("Usuario");
-
             entity.HasKey(e => e.Id);
+
+            entity.ToTable("Usuario");
 
             entity.Property(e => e.Id)
                 .ValueGeneratedOnAdd();

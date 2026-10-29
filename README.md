@@ -42,7 +42,7 @@ dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
 #### Comando de Scaffolding:
 El comando para realizar ingeniería inversa sobre la base de datos SQL Server remota es:
 ```bash
-dotnet ef dbcontext scaffold "Server=SQL8020.site4now.net;Database=db_a358b2_pam3;User Id=db_a358b2_pam3_admin;Password=TudaiPam32548-;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -o Models -f
+dotnet ef dbcontext scaffold "Server=SQL8002.site4now.net;Database=db_a358b2_pam3;User Id=db_a358b2_pam3_admin;Password=TudaiPam32548-;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -o Models -f
 ```
 * **`-o Models`**: Especifica que las entidades generadas y el contexto se ubiquen en el directorio `Models`.
 * **`-f` (force)**: Fuerza la sobrescritura de archivos existentes.
@@ -80,7 +80,7 @@ Por buenas prácticas de desarrollo y seguridad (evitando *hardcodear* credencia
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=SQL8020.site4now.net;Database=db_a358b2_pam3;User Id=db_a358b2_pam3_admin;Password=TudaiPam32548-;TrustServerCertificate=True;"
+    "DefaultConnection": "Server=SQL8002.site4now.net;Database=db_a358b2_pam3;User Id=db_a358b2_pam3_admin;Password=TudaiPam32548-;TrustServerCertificate=True;"
   }
 }
 ```
